@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Tool - Noxxa</title>
+<style>
+body {
+  margin: 0; padding: 0;
+  height: 100vh;
+  background: #000814;
+  display: flex; justify-content: center; align-items: center;
+  font-family:'Courier New', monospace;
+  color:#00f0ff;
+}
+.container {
+  background: #001d3d;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align:center;
+  box-shadow: 0 0 50px rgba(0,240,255,0.8);
+}
+input {
+  width: 80%;
+  padding: 1rem;
+  font-size:1.2rem;
+  border-radius:10px;
+  border:none;
+  background:#001f4d;
+  color:#00f0ff;
+  text-align:center;
+}
+button {
+  margin-top:1rem;
+  padding:1rem 2rem;
+  font-size:1.1rem;
+  border:none;
+  border-radius:12px;
+  background:#00f0ff;
+  color:#001d3d;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow: 0 0 10px #00f0ff;
+}
+button:hover { background:#00cfff; }
+.hidden { display:none; }
+hr { border-color:#333; margin:1rem 0; }
+</style>
+</head>
+<body>
+
+<!-- API Key -->
+<div class="container" id="apikey-container">
+<h2>Masukkan API Key</h2>
+<input type="password" id="apikey" placeholder="API Key">
+<button onclick="checkApiKey()">Submit</button>
+</div>
+
+<!-- Menu Fitur -->
+<div class="container hidden" id="menu-container">
+<h2>🤖 Galaxy Fitur - Robot Theme</h2>
+
+<h3>📥 Get HTML</h3>
+<input type="text" id="url" placeholder="Masukkan link website...">
+<button onclick="getHTML()">Get HTML & Download</button>
+
+<h3>🔒 Encrypt JS</h3>
+<input type="file" id="jsfile" accept=".js">
+<button onclick="encryptJS()">Encrypt JS & Download</button>
+
+<h3>🗂 Get Site ZIP</h3>
+<input type="text" id="zipurl" placeholder="Masukkan link website...">
+<button onclick="getSiteZip()">Download ZIP</button>
+</div>
+
+<script>
+function checkApiKey(){
+  const key = document.getElementById('apikey').value;
+  if(key === "Galaxy"){
+    document.getElementById('apikey-container').classList.add('hidden');
+    document.getElementById('menu-container').classList.remove('hidden');
+  } else {
+    alert('API Key salah!');
+  }
+}
+
+async function getHTML(){
+  const url = document.getElementById('url').value;
+  if(!url){ alert('Masukkan URL!'); return; }
+  const form = new FormData(); form.append('url',url);
+  const res = await fetch('/api/gethtml',{method:'POST',body:form});
+  if(res.ok){
+    const blob = await res.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='source.html';
+    a.click();
+  } else alert('Gagal ambil HTML');
+}
+
+async function encryptJS(){
+  const fileInput = document.getElementById('jsfile');
+  const file = fileInput.files[0];
+  if(!file){ alert('Pilih file JS!'); return; }
+  const form = new FormData(); form.append('jsfile',file);
+  const res = await fetch('/api/encryptjs',{method:'POST',body:form});
+  if(res.ok){
+    const blob = await res.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='encrypted-'+file.name;
+    a.click();
+  } else alert('Gagal encrypt JS');
+}
+
+async function getSiteZip(){
+  const url = document.getElementById('zipurl').value;
+  if(!url){ alert('Masukkan URL!'); return; }
+  const form = new FormData(); form.append('url',url);
+  const res = await fetch('/api/getsitezip',{method:'POST',body:form});
+  if(res.ok){
+    const blob = await res.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='website_code.zip';
+    a.click();
+  } else alert('Gagal zip website');
+}
+</script>
+
+</body>
+</html>
